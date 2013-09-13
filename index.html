@@ -1,0 +1,86 @@
+<html>
+<head>
+	<title>Gear Calculator</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+		<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="./css/bootstrap-select.css">
+	<link rel="stylesheet" href="./css/fuelux.min.css">
+	<link rel="stylesheet" href="./css/main.css">
+</head>
+<body>
+	<div class="container">
+		<h1>Gear Calculator</h1>
+
+		<div class=".col-md-6">
+			<form role="form" id="add-bike">
+			  <div class="form-group">
+			    <label for="bike-name">Bike name:</label>
+			    <input type="text" class="form-control" id="bike-name" placeholder="Enter name">
+			  </div>
+			  <div class="form-group">
+			  	<label for="rim-picker">Rim size:</label>
+			  	<select class="selectpicker" data-show-subtext="true" id="rim-picker"></select>
+			  </div>
+			  <div class="form-group">
+			  	<label for="tire-picker">Tire size:</label>
+			  	<select class="selectpicker" data-show-subtext="true" id="tire-picker"></select>
+			  </div>
+			  <div id="chainringContainer" style="width:5em;display:inline-block"></div>
+			  <div id="cassetteContainer" style="width:5em;display:inline-block"></div>
+		    	<div class="fuelux">
+					<div id="chainringSpinner" class="spinner">
+						<input type="text" class="input-mini spinner-input">
+						<div class="spinner-buttons	btn-group btn-group-vertical">
+							<button type="button" class="btn spinner-up">
+								<i class="icon-chevron-up"></i>
+							</button>
+							<button type="button" class="btn spinner-down">
+								<i class="icon-chevron-down"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+		    	<div class="fuelux">
+					<div id="cassetteSpinner" class="spinner">
+						<input type="text" class="input-mini spinner-input">
+						<div class="spinner-buttons	btn-group btn-group-vertical">
+							<button type="button" class="btn spinner-up">
+								<i class="icon-chevron-up"></i>
+							</button>
+							<button type="button" class="btn spinner-down">
+								<i class="icon-chevron-down"></i>
+							</button>
+						</div>
+					</div>
+				</div>
+			  <div class="form-group">
+			  	<label for="crank">Crank length(mm):</label>
+			  	<input type="number" class="form-control spinner" id="crank" placeholder="165" value="165">
+			  </div>
+			  	<div class=".chainring-container form-inline"></div>
+				<div class=".cassette-container form-inline"></span></div>
+			  <button type="submit" class="btn btn-default" value="Go">Add bike</button>
+			</form>
+	    </div>
+
+
+	    <div id="vis"></div>
+    </div>
+
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
+	<script src="./js/bootstrap-select.js"></script>
+	<script src="./js/require.js"></script>
+	<script src="./js/spinner.js"></script>
+	<script src="./js/gearcalc.js"></script>
+</body>
+</html>
+
+
+
