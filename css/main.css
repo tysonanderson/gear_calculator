@@ -36,3 +36,16 @@ input.spinner{
 	display: inline-block;
 	width: 100%;
 }
+
+#add-bike{
+	display: none;
+}
+
+#crank{
+	/*width:5em;*/
+}
+
+#add-btn{
+	margin-top: 1.75em;
+	width:100%;
+}

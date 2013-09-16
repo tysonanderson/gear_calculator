@@ -1,6 +1,6 @@
 <html>
 <head>
-	<title>Gear Calculator</title>
+	<title>Gear Range Visualizer</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 		<!-- Latest compiled and minified CSS -->
@@ -13,9 +13,52 @@
 </head>
 <body>
 	<div class="container">
-		<h1>Gear Calculator</h1>
+		<h1>Gear Range Visualizer</h1>
 
-		<div class=".col-md-6">
+		<div class="col-md-8">
+			<form role="form" id="vendor-options">
+				<div class = "row">
+					<div class="col-md-4">
+						<div class="form-group">
+						  <label for="vendor-name">Brand:</label>
+						  <select class="form-control" id="vendor-name">
+						  	<option value="Select a vendor..." class="label-remove">Select a component brand...</option>
+						  </select>
+						</div>
+						<div class="form-group">
+						  <label for="gearing-type">Type:</label>
+						  <select class="form-control" id="gearing-type">
+						  	<option value="Select a vendor..." class="label-remove">Select a type...</option>
+						  </select>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group">
+						  <label for="vendor-crankset">Crankset:</label>
+						  <select class="form-control" id="vendor-crankset" disabled = "true"></select>
+						</div>
+						<div class="form-group">
+						  <label for="vendor-cassette">Cassette:</label>
+						  <select class="form-control" id="vendor-cassette" disabled = "true"></select>
+						</div>
+					</div>
+				</div>
+				<div class = "row">
+					<div class="col-md-4">
+						<div class="form-group">
+						  	<label for="crank">Crank length(mm):</label>
+						  	<input type="number" class="form-control spinner" id="crank" placeholder="165" value="165">
+					 	</div>
+					 </div>
+					 <div class="col-md-4">
+				 		<button type="submit" class="btn btn-default" value="Go" id="add-btn">Add bike</button>
+				 	</div>
+			 	</div>
+			</form>
+		</div>
+
+
+		<div class="col-md-4">
 			<form role="form" id="add-bike">
 			  <div class="form-group">
 			    <label for="bike-name">Bike name:</label>
@@ -67,6 +110,14 @@
 			</form>
 	    </div>
 
+	    <form role="form" id = "visOptions">
+	    	<select class="form-control" id="measureType">
+			  <option value="gainRatio">Gain ratio</option>
+			  <option value="gearInches">Gear inches</option>
+			  <option value="devMeters">Development in meters</option>
+			</select>
+	    </form>
+
 
 	    <div id="vis"></div>
     </div>
@@ -75,6 +126,7 @@
 	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/d3/3.2.2/d3.v3.min.js"></script>
+	<script src="//cloud.github.com/downloads/misoproject/dataset/miso.ds.deps.min.0.4.0.js"></script>
 	<script src="./js/bootstrap-select.js"></script>
 	<script src="./js/require.js"></script>
 	<script src="./js/spinner.js"></script>
