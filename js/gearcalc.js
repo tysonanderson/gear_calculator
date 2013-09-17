@@ -1,5 +1,5 @@
-var rims = [{"name":"27inch","iso":630,"wheel_mm":670},
-			{"name":"700c / 29er","iso":622,"wheel_mm":662},
+var rims = [{"name":"700c / 29er","iso":622,"wheel_mm":662},
+			{"name":"27inch","iso":630,"wheel_mm":670},
 			{"name":"650c","iso":571,"wheel_mm":611},
 			{"name":"26inch mtb","iso":559,"wheel_mm":599},
 			{"name":"24inch S5","iso":547,"wheel_mm":587},
@@ -139,10 +139,6 @@ $('#gearing-type').change(function (){
 
 })
 
-//convert a comma sep string to an array
-function textToArray(d){ return $.map(d.split(','), function (cog){ return parseInt(cog)}) }
-
-//_.uniq(ds.column('vendor').data)
 
 var bikes = [];
 
@@ -150,51 +146,35 @@ var svg = d3.select('#vis').append('svg')
 		.attr('width', 600)
 		.attr('height', 500);
 
+//mesure method to be replaced by different measurement option functions
 
-var gearings = [
-	{type: "standard", chainrings: [39,53], cassette: [11,12,13,14,15,17,19,21,23,25,28]}
-];
-
-
-var gainRatio = function (bike,measure){
-	var rval = [];
-	$.each(bike.chainrings, function(i,cr){
-		switch(measure){
-			case "gainRatio":
-				rval.push( $.map(bike.cassette, function(sprocket){ return ((bike.wheel/Math.PI)/2) / bike.crank * (cr / sprocket)}) )
-			break;
-			case "gearInches":
-				rval.push( $.map(bike.cassette, function(sprocket){ return ((bike.wheel/Math.PI) * (cr / sprocket)) * 0.039370}) )
-			break;
-			case "devMeters":
-				rval.push( $.map(bike.cassette, function(sprocket){ return ((bike.wheel/1000) * (cr / sprocket)) * Math.PI}) )
-			break;
-			default:
-				rval.push( $.map(bike.cassette, function(sprocket){ return ((bike.wheel/Math.PI)/2) / bike.crank * (cr / sprocket)}) )
-			break;
-		}
-		
-	})
-	
-	return rval;
+//measument object
+var Measure = function(calcFun, units){
+	this.calcFun = calcFun;
+	this.units = units;
+}
+Measure.prototype.calc = function (cr){
+	return this.calcFun(cr);
 }
 
-var gearInches = function (bike){
-	var rval = [];
-	$.each(bike.chainrings, function(i,cr){
-		rval.push( $.map(bike.cassette, function(sprocket){ return ((bike.wheel/Math.PI) * (cr / sprocket)) * 0.039370}) )
-	})
-	
-	return rval;
-}
+//ALL MEASUREMENT METHODS -----------
+var gainRatio = new Measure(function(cr){
+	return $.map(cr.cassette, function(sprocket){ return ((cr.wheel/Math.PI)/2) / cr.crank * (cr.chainring / sprocket)})
+},"Gain ratio");
 
-var devMeters = function (bike){
-	var rval = [];
-	$.each(bike.chainrings, function(i,cr){
-		rval.push( $.map(bike.cassette, function(sprocket){ return ((bike.wheel/1000) * (cr / sprocket)) * Math.PI}) )
-	})
-	return rval;
-}
+var gearInches = new Measure(function(cr){
+	return $.map(cr.cassette, function(sprocket){ return ((cr.wheel/Math.PI) * (cr.chainring / sprocket)) * 0.039370})
+},"Gear inches");
+
+var devMeters = new Measure(function(cr){
+	return $.map(cr.cassette, function(sprocket){ return ((cr.wheel/1000) * (cr.chainring / sprocket)) * Math.PI})
+},"Development in meters");
+
+
+var measureMethod = gainRatio;
+
+
+
 
 //create select boxes for tire and rims
 $.each( rims, function(i,d){
@@ -241,34 +221,52 @@ $('#cassetteSpinner').on('changed', function (){
 
 })
 
+//controls for measurment select
+$('#measureType').change(function(e){
 
-//add event to bike addition form !!! OLD FUNCTION THAT PAIRS WITH CUSTOM FORM !!!
-$('#add-bike').submit(function(e){
-	bikes.push( processForm(e.currentTarget) );
+	measureMethod = window[e.currentTarget.value];
 	addVis();
-	return false;
- })
+
+})
+
+//engage modal on page load
+$('#bikeAddModal').modal('show');
 
 
 //add event to bike addition form
-$('#vendor-options').submit(function(e){
+$('#add-btn').click(function(e){
+	$('#bikeAddModal').modal('hide');
 	
 	bikes.push( processVendorForm(e.currentTarget) );
+
 	addVis();
 	return false;
- })
+ });
+
+$('#addBike').click(function(e){
+
+	$('#bikeAddModal').modal('show');
+ });
+
+//add event to window to redraw vis on resize
+$(window).resize(function() {
+	console.log("resize")
+	addVis();
+});
 
 function processVendorForm(form){
 
 	var bike = {
 		name: $('#vendor-name').val(),
+		description: $('#vendor-crankset').val() + " - " + $('#vendor-cassette').val(),
 		wheel: wheelSize(rims[$.inArray($('#rim-picker').prop('value'),$.map(rims, function (d){  return d.name }))].iso,
 				tires[$.inArray($('#tire-picker').prop('value'),$.map(tires, function (d){  return d.name }))].tire_mm),
 		chainrings: textToArray(chainrings.where({columns:['name_description','chainrings'], rows: function(row){ return new String( row.name_description ).replace(/\s+/g, ' ') === new String($('#vendor-crankset').val() ).replace(/\s+/g, ' ') } }).toJSON()[0].chainrings),
 		cassette: textToArray(cassette.where({columns:['name_description','sprockets'], rows: function(row){ return new String( row.name_description ).replace(/\s+/g, ' ') === new String($('#vendor-cassette').val() ).replace(/\s+/g, ' ') } }).toJSON()[0].sprockets),
 		crank: parseInt($('#crank').val())
-
 	}
+	bike.cassette = bike.cassette.sort(function(a,b){return a-b});
+	bike.chainrings = bike.chainrings.sort(function(a,b){return a-b});
 
 	return bike;
 }
@@ -291,78 +289,123 @@ function processForm(form){
 	return bike;
 }
 
+
+
+//width of description column for bikes
+var textCol = 275;
+
+var color =  d3.scale.category10(),
+	x = d3.scale.linear().range([textCol,$('#vis').width() - 20]);
+
+
+
+function addVis(){
+
+	//clear existing svg and replace with new content
+	$('svg').remove();
+
+	svg = d3.select('#vis').append('svg')
+		.attr('width', $('#vis').width())
+		.attr('height', 500);
+
+	//reset the domain of the x axis to match the min/max of the current data 
+	x.domain([getMin(), getMax()])
+    
+    //add an svg:g element for each bike in the vis
+	var bikeGrouping = svg.selectAll('.bike-group')
+		.data(bikes)
+		.enter()
+		.append('g')
+		.attr('class', 'bike-group')
+		.attr('transform', function (d,i){ return 'translate(10,' + ((i * 60) + 10) + ')'});
+
+	//add an svg:g element for chainring
+	var chainringGrouping = bikeGrouping.selectAll('.cr-group')
+		.data(function (d){
+			return $.map(d.chainrings, function (cr){ return {wheel:d.wheel, chainring: cr, cassette: d.cassette, crank: d.crank} })
+		})
+		.enter()
+		.append('g')
+	 	.attr('class', 'cr-group')
+	    .attr('transform', function (d,i){ return 'translate(0,' + (i * 20) + ')'});
+
+	//tick line for each chainring
+	chainringGrouping.append('line')
+		.attr('x1', textCol)
+		.attr('x2', $('#vis').width() - 20)
+		.attr('class', 'cr-tick');
+
+	//add an svg:line element for chainring to show range
+	var gearRange = chainringGrouping.selectAll('.gear-line')
+		.data( function(d){ return [measureMethod.calc(d)] })
+		.enter()
+		.append('line')
+		.attr('x1',function (d){return x(d3.min(d)) } )
+		.attr('x2',function (d){return x(d3.max(d)) } )
+		.attr('y1',0)
+		.attr('y2',0)
+		.attr('class', 'gear-line');
+
+	svg.selectAll('.bike-group').selectAll('.gear-line').attr('stroke', function(d,i,j){return color(j)})
+
+	 //add an svg:circle element for each possible gear combination
+	 var gearDot = chainringGrouping.selectAll('.gear-dot')
+	 	.data( function(d){ return measureMethod.calc(d) } )
+	 	.enter()
+	 	.append('circle')
+	 	.attr('r', $(window).width() < 600 ? 3 : 5)
+	 	.attr('cx',function(d){return x(d) })
+	    .attr('class',"gear-dot");
+
+	svg.selectAll('.bike-group').selectAll('.gear-dot').attr('stroke', function(d,i,j){return color(j)})
+
+	//labels for each chainring
+	chainringGrouping.append('text')
+		.attr('x', textCol - 25)
+		.attr('y', ".5em")
+		.text(function (d){ return d.chainring})
+		.attr('class', 'cr-label');
+
+	//labels for each bike
+	bikeGrouping.append('text')
+		.attr('y', 1)
+		.attr('x', 1)
+		.text(function (d){ return d.name})
+		.attr('class', 'bike-label');
+
+	//FIXME: slicing the text off at 30 chars for now
+	bikeGrouping.append('text')
+		.attr('y', "1em")
+		.attr('x', 1)
+		.text(function (d){ return d.description.slice(0,30)})
+		.attr('class', 'bike-description');
+
+	//add axis
+	var xAxis = d3.svg.axis().scale(x);
+
+	svg.append("g")
+		.attr("transform", "translate(10," + ((bikes.length * 60) + 10) +")")
+		.call(xAxis);
+
+	//axis label	
+	svg.append("text").attr('y', ((bikes.length * 60) + 50)).attr('x', (($('#vis').width() - textCol) * 0.5)+textCol ).attr('class','unit-label').text(measureMethod.units);
+
+}
+
+// UTILITY FUNCTIONS --------
+
+function getMin(){
+	return d3.min($.map(bikes, function(d){ return $.map(d.chainrings, function (cr){ return measureMethod.calc(  {wheel:d.wheel, chainring: cr, cassette: d.cassette, crank: d.crank} )}) }));
+}
+function getMax(){
+	return d3.max($.map(bikes, function(d){ return $.map(d.chainrings, function (cr){ return measureMethod.calc(  {wheel:d.wheel, chainring: cr, cassette: d.cassette, crank: d.crank} )}) }));
+}
+
+//convert a comma sep string to an array
+function textToArray(d){ return $.map(d.split(','), function (cog){ return parseInt(cog)}) }
+
 //tire calc
 function wheelSize(rim,tire){
 	return (rim + (tire * 2)) * Math.PI;
 }
-
-var color =  d3.scale.category10(),
-	x = d3.scale.linear().range([0,500]);
-
-function addVis(){
-
-	// var groups = $.map(gainRatio(bikes[0]), function(d){ return svg.data(d).append('g') });
-	var groups = svg.selectAll('.cr-group')
-	    .data(gainRatio(bikes[0], $('#visOptions > select').prop('value')))
-	    .enter()
-	    .append('g')
-	    .attr('class', 'cr-group')
-	    .attr('transform', function (d,i){ return 'translate(10,' + ((i * 10) + 10) + ')'})
-
-	// groups[0].selectAll('circle')
-
-	var minVal = d3.min(d3.min(gainRatio(bikes[0], $('#visOptions > select').prop('value')))),
-		maxVal = d3.max(d3.max(gainRatio(bikes[0], $('#visOptions > select').prop('value'))));
-	x.domain([d3.min(d3.min(gainRatio(bikes[0], $('#visOptions > select').prop('value')))),d3.max(d3.max(gainRatio(bikes[0], $('#visOptions > select').prop('value')))) ])
-
-	function makeCircles(d, i){
-		var c = color(i);
-	    d3.select(this).selectAll('circle')
-	        .data(d)
-	        .enter()
-	        .append('circle')
-	        .attr('r', 3)
-	        .attr('cx',function(d){return x(d) })
-	        .attr('fill', function (d){return color(c)})
-    }
-    groups.each(makeCircles);
-
-    function makeLines(d, i){
-		var c = color(i);
-	    d3.select(this)
-	        .append('line')
-	        .attr('x1',x(d3.min(d)))
-	        .attr('x2',x(d3.max(d)))
-	        .attr('y1',0)
-	        .attr('y2',0)
-	        .attr('stroke-width', 2)
-	        .attr('stroke', color(c))
-    }
-    groups.each(makeLines);
-
-	var xAxis = d3.svg.axis()
-    	.scale(x);
-
-	svg.append("g")
-	    .attr("transform", "translate(10," + bikes[0].chainrings.length * 14 +")")
-	    .call(xAxis);
-
-	// var g = svg.selectAll('g')
-	// 	.data(gainRatio(bikes[0]))
-	// 	.enter()
-	// 	.append('g');
-
-	// g.append('circle')
-	// 	.attr('r', 5)
-	// 	.attr('cx', function (d){ console.log(d);return d })
-
-	// g.append('circle')
-	// 	.data(d)
-	// 	.attr('r', 3)
-	// 	.attr('cx',function(d){  console.log(d); return d});
-}
-
-
-
-
 

@@ -1,3 +1,25 @@
+@import url(http://fonts.googleapis.com/css?family=Raleway:400,600,200);
+body{
+	font-family: 'Raleway', sans-serif;
+}
+
+
+h1 {
+	font-family: 'Raleway', sans-serif;
+	font-weight: 600;
+	text-transform:uppercase;
+	margin-left: 1em;
+	margin-top: .75em;
+}
+#gear-art{
+	width:40em;
+}
+.header{
+	text-align: center;
+	margin-top: 2em;
+	margin-bottom: 3em;
+}
+
 .sprocket{
 	width: 40px;
 }
@@ -44,8 +66,25 @@ input.spinner{
 #crank{
 	/*width:5em;*/
 }
+/*--------------- visualization styles --------------------*/
 
-#add-btn{
-	margin-top: 1.75em;
-	width:100%;
+.gear-dot{
+	stroke-width: 2;
+	fill: #FFF;
+}
+.gear-line{
+	stroke-width: 4;
+}
+.cr-tick{
+	stroke: #ccc;
+}
+.bike-label{
+	font-weight: bold;
+}
+.bike-description{
+
+}
+.unit-label{
+	text-anchor: middle;
+	font-weight: 600;
 }
