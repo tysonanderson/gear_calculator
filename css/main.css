@@ -69,8 +69,8 @@ input.spinner{
 /*--------------- visualization styles --------------------*/
 
 .gear-dot{
-	stroke-width: 2;
-	fill: #FFF;
+/*	stroke-width: 2;
+	fill: #FFF;*/
 }
 .gear-line{
 	stroke-width: 4;

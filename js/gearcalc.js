@@ -159,7 +159,7 @@ Measure.prototype.calc = function (cr){
 
 //ALL MEASUREMENT METHODS -----------
 var gainRatio = new Measure(function(cr){
-	return $.map(cr.cassette, function(sprocket){ return ((cr.wheel/Math.PI)/2) / cr.crank * (cr.chainring / sprocket)})
+	return $.map(cr.cassette, function(sprocket){ return ((cr.wheel/Math.PI)/2) / cr.crank * (cr.chainring / sprocket)});
 },"Gain ratio");
 
 var gearInches = new Measure(function(cr){
@@ -250,7 +250,6 @@ $('#addBike').click(function(e){
 
 //add event to window to redraw vis on resize
 $(window).resize(function() {
-	console.log("resize")
 	addVis();
 });
 
@@ -296,6 +295,8 @@ var textCol = 275;
 
 var color =  d3.scale.category10(),
 	x = d3.scale.linear().range([textCol,$('#vis').width() - 20]);
+
+var color = d3.scale.ordinal().range(['#F9B84B','#00A8C6','#F9B84B','#00A8C6','#F9B84B','#00A8C6','#F9B84B','#00A8C6','#F9B84B','#00A8C6','#F9B84B','#00A8C6'])
 
 
 
@@ -357,7 +358,8 @@ function addVis(){
 	 	.attr('cx',function(d){return x(d) })
 	    .attr('class',"gear-dot");
 
-	svg.selectAll('.bike-group').selectAll('.gear-dot').attr('stroke', function(d,i,j){return color(j)})
+
+	svg.selectAll('.bike-group').selectAll('.gear-dot').attr('fill', function(d,i,j){return color(j)})
 
 	//labels for each chainring
 	chainringGrouping.append('text')
