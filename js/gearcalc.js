@@ -146,7 +146,6 @@ var svg = d3.select('#vis').append('svg')
 		.attr('width', 600)
 		.attr('height', 500);
 
-//mesure method to be replaced by different measurement option functions
 
 //measument object
 var Measure = function(calcFun, units){
@@ -167,9 +166,10 @@ var gearInches = new Measure(function(cr){
 },"Gear inches");
 
 var devMeters = new Measure(function(cr){
-	return $.map(cr.cassette, function(sprocket){ return ((cr.wheel/1000) * (cr.chainring / sprocket)) * Math.PI})
+	return $.map(cr.cassette, function(sprocket){ return (((cr.wheel/1000)/Math.PI) * (cr.chainring / sprocket)) * Math.PI})
 },"Development in meters");
 
+//dividing the chainwheel size by the rear sprocket size, multiplying the result by the wheel diameter and by pi (3.1416)
 
 var measureMethod = gainRatio;
 
@@ -356,7 +356,9 @@ function addVis(){
 	 	.append('circle')
 	 	.attr('r', $(window).width() < 600 ? 3 : 5)
 	 	.attr('cx',function(d){return x(d) })
-	    .attr('class',"gear-dot");
+	    .attr('class',"gear-dot")
+	    .append('title')
+	    .text( function (d){ return d } );
 
 
 	svg.selectAll('.bike-group').selectAll('.gear-dot').attr('fill', function(d,i,j){return color(j)})
@@ -408,6 +410,7 @@ function textToArray(d){ return $.map(d.split(','), function (cog){ return parse
 
 //tire calc
 function wheelSize(rim,tire){
-	return (rim + (tire * 2)) * Math.PI;
+	console.log( rim + tire)
+	return (rim + tire) * Math.PI;
 }
 
